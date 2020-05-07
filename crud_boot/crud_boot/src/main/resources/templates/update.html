@@ -1,0 +1,24 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>update</title>
+</head>
+<body>
+<h2 th:text="${bdMethod}">"</h2>
+<form th:action="@{/admin/update}" method="post">
+    <p><label>name<input type="text" name="name" th:value="${user.username}"></label>
+    <p><input type="hidden" title="name" name="userID" th:value="${user.user_id}">
+    <p><label>password<input type="text" title="password" name="password" th:value="${user.password}"></label>
+
+    <p></p><input type="checkbox" name="adminRole" value="ADMIN"
+                  th:checked="${user.getRoleNames().contains('ADMIN')}">
+    <label>ADMIN</label>
+    <p></p><input type="checkbox" name="userRole" value="USER"
+                  th:checked="${user.getRoleNames().contains('USER')}">
+
+    <label>USER</label>
+
+    <p><input type="submit" value="submit">
+</form>
+
+</body>
+</html>

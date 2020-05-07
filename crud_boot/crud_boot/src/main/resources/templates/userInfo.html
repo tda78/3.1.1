@@ -1,0 +1,17 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>user</title>
+</head>
+<body>
+<!--<div th:text="${user.user_id}"></div></h2>-->
+<h2>name:</h2><h2 th:text="${user.username}"></h2>
+<h2>password:</h2>
+<h2 th:text="${user.password}"></h2>
+<h1>roles:</h1>
+<div th:each="role:${user.roles}">
+ <h2 th:text="${role.rolename}"></h2>
+</div>
+
+<div th:insert="logout.html"/>
+</body>
+</html>

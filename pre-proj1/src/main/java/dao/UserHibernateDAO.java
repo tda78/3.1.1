@@ -8,15 +8,18 @@ import org.hibernate.Transaction;
 import org.hibernate.service.ServiceRegistry;
 import util.DBHelper;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 public class UserHibernateDAO implements UserDAO {
 
     private static SessionFactory sessionFactory;
 
-    public UserHibernateDAO(){
+    public UserHibernateDAO() throws IOException {
         sessionFactory = getSessionFactory();
     }
+
     @Override
     public List<User> getAllUsers() {
         Session session = sessionFactory.openSession();
@@ -25,6 +28,19 @@ public class UserHibernateDAO implements UserDAO {
         transaction.commit();
         session.close();
         return users;
+    }
+
+    @Override
+    public User getUserByName(String name) throws SQLException {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("FROM User WHERE name='"
+                + name + "';");
+        User user = (User) query.list().get(0);
+        transaction.commit();
+        session.close();
+        return user;
+
     }
 
     @Override
@@ -38,8 +54,7 @@ public class UserHibernateDAO implements UserDAO {
     }
 
     @Override
-    public void addUser(String name, String password) {
-        User user = new User(name, password);
+    public void addUser(User user) throws SQLException {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         session.save(user);
@@ -48,15 +63,12 @@ public class UserHibernateDAO implements UserDAO {
     }
 
     @Override
-    public void updateUser(String id, String name, String password) {
-        User user = new User(Long.parseLong(id), name, password);
+    public void updateUser(User user) throws SQLException {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         session.update(user);
-
         transaction.commit();
         session.close();
-
     }
 
     @Override
@@ -69,7 +81,7 @@ public class UserHibernateDAO implements UserDAO {
         session.close();
     }
 
-    private  SessionFactory getSessionFactory (){
+    private  SessionFactory getSessionFactory () throws IOException {
         if(sessionFactory == null){
             sessionFactory = DBHelper.getSessionFactory();
         }

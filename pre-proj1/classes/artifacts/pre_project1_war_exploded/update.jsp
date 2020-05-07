@@ -13,10 +13,12 @@
 </head>
 <body>
 <h2>${bdMethod}</h2>
-    <form action="/update" method="post">
+    <form action="/admin/update" method="post">
         <input type="text" name="name"  value=${userName}>
         <input type="hidden" title="name" name="userID" value=${userID}>
         <input type="text" title="password" name="password" value=${userPassword}>
+        <input type="text" title="role" name="role" value=${userRole}>
+
         <input type="submit" value="submit">
     </form>
 </body>

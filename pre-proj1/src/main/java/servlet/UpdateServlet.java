@@ -1,7 +1,7 @@
 package servlet;
 
 import model.User;
-import service.UserService;
+import service.UserServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,10 +9,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet("/update")
+@WebServlet("/admin/update")
 public class UpdateServlet extends HttpServlet {
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) throws ServletException, IOException {
@@ -23,16 +22,18 @@ public class UpdateServlet extends HttpServlet {
             request.setAttribute("userID","");
             request.setAttribute("userName", "name");
             request.setAttribute("userPassword", "password");
+            request.setAttribute("userRole", "user");
             getServletContext().getRequestDispatcher("/update.jsp").forward(request, response);
 //            response.setStatus(HttpServletResponse.SC_OK);
 
         } else {
             try {
                 request.setAttribute("bdMethod", "UPDATE CLIENT");
-                User user = UserService.getInstance().getUser(Long.parseLong(id));
+                User user = UserServiceImpl.getInstance().getUser(Long.parseLong(id));
                 request.setAttribute("userName", user.getName());
                 request.setAttribute("userPassword", user.getPassword());
                 request.setAttribute("userID", user.getId());
+                request.setAttribute("userRole", user.getRole());
 
                 getServletContext().getRequestDispatcher("/update.jsp").forward(request, response);
  //               response.setStatus(HttpServletResponse.SC_OK);
@@ -49,17 +50,20 @@ public class UpdateServlet extends HttpServlet {
                        HttpServletResponse response) throws ServletException, IOException {
         try {
             String userName = request.getParameter("name");
-
             String userPassword = request.getParameter("password");
-            if (request.getParameter("userID") == "") {
+            String userRole = request.getParameter("role");
+            String id = request.getParameter("userID");
 
-                UserService.getInstance().addUser(userName,userPassword);
+            if (id == "") {
+                User user = new User(userName, userPassword, userRole);
+                UserServiceImpl.getInstance().addUser(user);
             }
             else {
-                UserService.getInstance().updateUser(
-                        request.getParameter("userID"), userName,userPassword);
+                User user = new User(Long.parseLong(id), userName, userPassword, userRole);
+                UserServiceImpl.getInstance().updateUser(user);
             }
-            List<User> users = UserService.getInstance().getAllUsers();
+
+            List<User> users = UserServiceImpl.getInstance().getAllUsers();
             request.setAttribute("users",users);
             getServletContext().getRequestDispatcher("/index.jsp").forward(request, response);
 

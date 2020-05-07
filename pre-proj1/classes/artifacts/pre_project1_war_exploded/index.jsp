@@ -21,18 +21,20 @@
     <caption>
         <th>name</th>
         <th>password</th>
+        <th>role</th>
+
     </caption>
     <c:forEach items="${users}" var="user">
         <tr>
             <td>${user.name}</td>
             <td>${user.password}</td>
-
+            <td>${user.role}</td>
             <td>
-                <form method="post" action="/users">
+                <form method="post" action="/admin">
                     <input type="hidden" name="userID" value=${user.id}>
                     <input type="submit" value="delete">
                 </form>
-                <form method="get" action="/update">
+                <form method="get" action="/admin/update">
                     <input type="hidden" name="userID" value=${user.id}>
                     <input type="submit" value="update">
                 </form>
@@ -41,7 +43,7 @@
         </tr>
     </c:forEach>
 </table>
-<form method="get" action="/update" >
+<form method="get" action="/admin/update" >
     <input type="hidden" name="userID" value=""></input>
     <input align="center" type="submit" width="500" value="new user">
 </form>

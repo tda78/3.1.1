@@ -1,10 +1,7 @@
 package model;
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
@@ -13,6 +10,7 @@ public class User {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name = "name")
@@ -21,17 +19,30 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    @Column (name = "role")
+    private String role;
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public User(){}
 
-    public User(long id, String name, String password) {
+    public User(long id, String name, String password, String role) {
         this.id = id;
         this.name = name;
         this. password = password;
+        this.role = role;
     }
 
-    public User(String name, String password) {
+    public User(String name, String password, String role) {
         this.name = name;
         this.password = password;
+        this.role = role;
     }
 
 

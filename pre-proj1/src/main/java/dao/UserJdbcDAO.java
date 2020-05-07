@@ -2,6 +2,7 @@ package dao;
 
 
 import model.User;
+import util.DBHelper;
 import util.PropertyReader;
 
 import java.sql.*;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class UserJdbcDAO implements UserDAO{
+public class UserJdbcDAO implements UserDAO {
 
     private static Connection connection;
 
@@ -31,16 +32,30 @@ public class UserJdbcDAO implements UserDAO{
             users.add(new User(
                     result.getLong(1),
                     result.getString(2),
-                    result.getString(3)));
+                    result.getString(3),
+                    result.getString(4))
+            );
         }
         result.close();
         statement.close();
         return users;
     }
 
-  /*  public boolean validateClient(String name, String password) throws SQLException {
-        return getClientByName(name).getPassword().equals(password);
-    }*/
+    @Override
+    public User getUserByName(String name) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute("select * from users where name='" + name + "'");
+        ResultSet result = statement.getResultSet();
+        result.next();
+        User user = new User(
+                result.getLong("id"),
+                result.getString("name"),
+                result.getString("password"),
+                result.getString("role")
+        );
+        result.close();
+        return user;
+    }
 
     public User getUser(long id) throws SQLException {
         Statement statement = connection.createStatement();
@@ -50,26 +65,41 @@ public class UserJdbcDAO implements UserDAO{
         User user = new User(
                 result.getLong("id"),
                 result.getString("name"),
-                result.getString("password")
+                result.getString("password"),
+                result.getString("role")
         );
         result.close();
         return user;
     }
 
-    public void addUser(String name, String password) throws SQLException {
-        execUpdate("insert into users (name, password) VALUES ('"
-                + name + "','"
-                + password + "');");
+    @Override
+    public void addUser(User user) throws SQLException {
+        execUpdate("insert into users (name, password, role) VALUES ('"
+                + user.getName() + "','"
+                + user.getPassword() + "','"
+                + user.getRole() + "');");
     }
 
-    public void updateUser(String id, String name, String password) throws SQLException {
+    @Override
+    public void updateUser(User user) throws SQLException {
+        execUpdate("update users set name='" + user.getName()
+                + "',password='" + user.getPassword()
+                + "',role='" + user.getRole()
+                + "' where id = '" + user.getId() + "';");
+
+    }
+
+
+
+    public void updateUser(String id, String name, String password, String role) throws SQLException {
         execUpdate("update users set name='" + name
-                +"',password='" + password+
-                "' where id = '" + id + "';");
+                + "',password='" + password
+                + "',role='" + role
+                + "' where id = '" + id + "';");
     }
 
     public void deleteUser(String id) throws SQLException {
-        execUpdate("delete from users where id=" + id +";");
+        execUpdate("delete from users where id=" + id + ";");
     }
 
     private void execUpdate(String update) throws SQLException {
@@ -77,24 +107,8 @@ public class UserJdbcDAO implements UserDAO{
         statement.execute(update);
         statement.close();
     }
-    private static Connection getMysqlConnection() throws Exception {
-        try {
-            Properties properties = PropertyReader.read();
-            final String uRL = properties.getProperty("db.Url");
-            final String login = properties.getProperty("db.Login");
-            final String password = properties.getProperty("db.Password");
-            final String driver = properties.getProperty("db.Driver");
-            Class.forName(driver);
-            connection = DriverManager.getConnection(uRL, login, password);
-            //Connection connection = DriverManager.getConnection(url.toString());
 
-            return connection;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new IllegalStateException();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            throw e;
-        }
+    private static Connection getMysqlConnection() throws Exception {
+        return DBHelper.getConnection();
     }
 }
